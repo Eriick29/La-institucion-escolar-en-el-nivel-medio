@@ -479,17 +479,22 @@ p,li{color:#f1e9ff}
 @media print{.grad,.grad2{background-image:none!important;background:none!important;filter:none!important}}
 
 /* ===== mundo tipo lienzo: cada diapositiva es un lugar unido por un hilo ===== */
-.deck{perspective:none!important;overflow:hidden}
-.mundo{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0;will-change:transform}
+#lienzo{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.deck{perspective:none!important;overflow:hidden;z-index:1}
+.mundo{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0;backface-visibility:hidden}
 .mundo .slide{right:auto!important;bottom:auto!important;position:absolute!important;opacity:1!important;visibility:visible!important;filter:none!important;
   transform:rotate(var(--r,0deg))!important;transition:none!important;border-radius:28px;background:var(--fondo)!important;
-  box-shadow:0 0 0 2px rgba(255,255,255,.07),0 40px 140px rgba(0,0,0,.7),0 0 120px -20px var(--brillo,rgba(199,125,255,.5))}
+  box-shadow:0 0 0 2px rgba(255,255,255,.08),0 30px 70px rgba(0,0,0,.6)}
 .mundo .slide.activa{transform:rotate(var(--r,0deg))!important}
+.mundo .slide,.mundo .slide.previa,.mundo .slide.activa{transform-origin:50% 50%!important}
 .mundo .slide .a,.mundo .slide .card{opacity:1!important;transform:none!important;animation:none!important}
 .mundo .slide .barra i{width:var(--w)!important}
 .mundo .slide:not(.activa) *{animation-play-state:paused!important}
 .mundo .slide:not(.activa) .gracias-txt span,.mundo .slide:not(.activa) .sub-final,.mundo .slide:not(.activa) .chip.brilla{opacity:1}
 .mundo .card,.mundo .graf,.mundo .chip{backdrop-filter:none!important}
+.mundo .slide.lejos{visibility:hidden!important}
+.mundo .ilus,.mundo .num{filter:none!important}
+.mundo .slide:not(.activa) .ilus svg{animation:none!important}
 .estrellas{position:absolute;pointer-events:none;
   background-image:radial-gradient(1.5px 1.5px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 90px 120px,#fff,transparent),
   radial-gradient(2px 2px at 160px 60px,rgba(255,255,255,.9),transparent),radial-gradient(1px 1px at 230px 190px,#fff,transparent),
@@ -497,8 +502,8 @@ p,li{color:#f1e9ff}
   background-size:300px 260px;opacity:.55}
 .nebulosa{position:absolute;border-radius:50%;pointer-events:none;opacity:.45}
 .hilo{position:absolute;overflow:visible;pointer-events:none}
-.hilo .h-glow{fill:none;stroke:rgba(255,195,0,.22);stroke-width:46;stroke-linecap:round;filter:blur(10px)}
-.hilo .h-base{fill:none;stroke:rgba(255,255,255,.35);stroke-width:10;stroke-linecap:round;stroke-dasharray:2 34;animation:fluye 2.5s linear infinite}
+.hilo .h-glow{fill:none;stroke:rgba(255,195,0,.12);stroke-width:40;stroke-linecap:round}
+.hilo .h-base{fill:none;stroke:rgba(255,255,255,.35);stroke-width:10;stroke-linecap:round;stroke-dasharray:2 34}
 .hilo .h-prog{fill:none;stroke:url(#gradHilo);stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset 1.5s cubic-bezier(.65,0,.35,1)}
 .hilo .h-nodo{fill:#10002b;stroke:#ffc300;stroke-width:8}
 .hilo .h-nodo.visto{fill:#ffc300}
@@ -508,7 +513,7 @@ p,li{color:#f1e9ff}
 .cortina,.chispa{display:none!important}
 @media print{
   .mundo{transform:none!important;position:static!important;width:auto!important;height:auto!important}
-  .estrellas,.hilo,.viajero,.nebulosa{display:none!important}
+  #lienzo,#geo{display:none!important}
   .slide,.mundo .slide{left:auto!important;top:auto!important;position:relative!important;transform:none!important;border-radius:0!important;box-shadow:none!important;
     width:1280px!important;height:720px!important;background:var(--fondo)!important}
   .slide.portada,.mundo .slide.portada{background:var(--fondo)!important}
@@ -532,7 +537,7 @@ p,li{color:#f1e9ff}
 <button class="btn-pdf" id="btnPdf" title="Descargar en PDF">⬇ <span class="txt">Descargar PDF</span></button>
 <div class="aviso-pdf" id="avisoPdf"><b>📄 Guardar en PDF (alta calidad)</b>En la ventana que se abre, en <b style="display:inline">Destino</b> elige <b style="display:inline">"Guardar como PDF"</b> y pulsa Guardar. Cada diapositiva sale en una página.<br><button id="btnPdfOk">Continuar</button></div>
 
-<main class="deck" id="deck"><div class="mundo" id="mundo"><div class="estrellas" id="estrellas"></div><svg class="hilo" id="hilo" xmlns="http://www.w3.org/2000/svg"></svg>
+<canvas id="lienzo"></canvas><svg id="geo" xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"></svg><main class="deck" id="deck"><div class="mundo" id="mundo">
 
 <!-- 1 PORTADA -->
 <section class="slide portada" data-tr="zoom">
@@ -778,7 +783,7 @@ p,li{color:#f1e9ff}
   </div>
 </section>
 
-<div class="viajero" id="viajero"></div></div></main>
+</div></main>
 
 <nav class="nav">
   <button id="ant" aria-label="Anterior">←</button>
@@ -977,72 +982,93 @@ document.getElementById('mmBtn').onclick=e=>{e.stopPropagation();const a=mm.clas
 document.addEventListener('click',e=>{if(!mm.contains(e.target))mm.classList.remove('abierto')});
 document.addEventListener('keydown',e=>{if(e.key==='m'||e.key==='M')mm.classList.toggle('abierto');if(e.key==='Escape')mm.classList.remove('abierto')});
 
-// ===== mundo + cámara + hilo =====
-const mundo=document.getElementById('mundo'),hilo=document.getElementById('hilo'),viajero=document.getElementById('viajero'),estrellas=document.getElementById('estrellas');
+// ===== mundo + cámara; fondo, hilo y viajero dibujados en canvas (fluido) =====
+const mundo=document.getElementById('mundo'),geo=document.getElementById('geo'),lz=document.getElementById('lienzo'),ctx=lz.getContext('2d');
 document.body.appendChild(document.getElementById('tip'));
-const DUR=1700;
 const ROT=[0,-4,3,-2,4,-3,2,-5,3,-2,4,-3,2,-4,0];
-// cada lugar con su propio ambiente de color (fondos oscuros para buena lectura)
 const AMB=[[285,320],[300,260],[265,200],[340,20],[350,30],[330,10],[200,170],[210,180],[190,160],[165,230],[175,250],[155,215],[220,280],[270,320],[280,330]];
 slides.forEach((s,i)=>{const [h1,h2]=AMB[i]||[280,320];
-  s.style.setProperty('--fondo',`radial-gradient(circle at 12% 18%,hsla(${h1},95%,58%,.34),transparent 42%),radial-gradient(circle at 88% 85%,hsla(${h2},95%,55%,.28),transparent 45%),linear-gradient(135deg,hsl(${h1},65%,8%),hsl(${h2},60%,13%))`);
-  s.style.setProperty('--brillo',`hsla(${h1},95%,60%,.55)`)});
-let POS=[],W=0,H=0,segEls=[],ACUM=[0],TOTAL=0,anim=null,rafV=null;
+  s.style.setProperty('--fondo',`radial-gradient(circle at 12% 18%,hsla(${h1},95%,58%,.34),transparent 42%),radial-gradient(circle at 88% 85%,hsla(${h2},95%,55%,.28),transparent 45%),linear-gradient(135deg,hsl(${h1},65%,8%),hsl(${h2},60%,13%))`)});
+let POS=[],W=0,H=0,DPR=1,segEls=[],ACUM=[0],TOTAL=0,rafV=null,vueloTok=0,CAM={x:0,y:0,r:0,s:1},VIA=null;
+let PATH=null,BB=null,ESTR=[],NEB=[],CENT=[],progVal=0,progObj=0,rafP=null,visto=0;
 function cam(x,y,r,s){return `translate(${W/2}px,${H/2}px) scale(${s}) rotate(${-r}deg) translate(${-x}px,${-y}px)`}
 function centro(i){const p=POS[i];return [p.x+W/2,p.y+H/2]}
 function camSlide(i,s=1){const [x,y]=centro(i);return cam(x,y,POS[i].r,s)}
+function fijarCam(x,y,r,s){CAM={x,y,r,s};mundo.style.transform=cam(x,y,r,s);dibujar()}
 function layout(){
-  W=innerWidth;H=innerHeight;
+  W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);lz.width=W*DPR;lz.height=H*DPR;
   const porFila=5,dx=W*1.75,dy=H*2.05,jit=[0,.3,-.25,.2,-.32];
-  POS=slides.map((s,i)=>{const f=Math.floor(i/porFila),k=i%porFila,c=f%2?porFila-1-k:k;
-    return {x:c*dx+(f%2?W*.35:0),y:f*dy+jit[k]*H,r:ROT[i]||0}});
+  POS=slides.map((s,i)=>{const f=Math.floor(i/porFila),k=i%porFila,c=f%2?porFila-1-k:k;return {x:c*dx+(f%2?W*.35:0),y:f*dy+jit[k]*H,r:ROT[i]||0}});
   slides.forEach((s,i)=>{const p=POS[i];s.style.left=p.x+'px';s.style.top=p.y+'px';s.style.width=W+'px';s.style.height=H+'px';s.style.setProperty('--r',p.r+'deg')});
-  const C=slides.map((_,i)=>centro(i));
-  let d=`M${C[0][0]} ${C[0][1]}`,segs=[];
-  for(let i=1;i<C.length;i++){
-    const [x0,y0]=C[i-1],[x1,y1]=C[i],vx=x1-x0,vy=y1-y0,L=Math.hypot(vx,vy),nx=-vy/L,ny=vx/L,amp=(i%2?1:-1)*L*.42;
+  CENT=slides.map((_,i)=>centro(i));
+  let d=`M${CENT[0][0]} ${CENT[0][1]}`,segs=[];
+  for(let i=1;i<CENT.length;i++){
+    const [x0,y0]=CENT[i-1],[x1,y1]=CENT[i],vx=x1-x0,vy=y1-y0,L=Math.hypot(vx,vy),nx=-vy/L,ny=vx/L,amp=(i%2?1:-1)*L*.42;
     const c1=`${x0+vx*.2+nx*amp} ${y0+vy*.2+ny*amp}`,c2=`${x0+vx*.8-nx*amp} ${y0+vy*.8-ny*amp}`;
     segs.push(`M${x0} ${y0} C${c1} ${c2} ${x1} ${y1}`);d+=` C${c1} ${c2} ${x1} ${y1}`}
-  const xs=C.map(c=>c[0]),ys=C.map(c=>c[1]),m=Math.max(W,H)*1.6;
-  const bx=Math.min(...xs)-m,by=Math.min(...ys)-m,bw=Math.max(...xs)-bx+m,bh=Math.max(...ys)-by+m;
-  Object.assign(hilo.style,{left:bx+'px',top:by+'px',width:bw+'px',height:bh+'px'});hilo.setAttribute('viewBox',`${bx} ${by} ${bw} ${bh}`);
-  Object.assign(estrellas.style,{left:bx+'px',top:by+'px',width:bw+'px',height:bh+'px'});
-  hilo.innerHTML=`<defs><linearGradient id="gradHilo" gradientUnits="userSpaceOnUse" x1="${bx}" y1="${by}" x2="${bx+bw}" y2="${by+bh}">
-    <stop offset="0" stop-color="#ffc300"/><stop offset=".35" stop-color="#ff4d6d"/><stop offset=".65" stop-color="#00e0c6"/><stop offset="1" stop-color="#c77dff"/></linearGradient></defs>
-    <path class="h-glow" d="${d}"/><path class="h-base" d="${d}"/><path class="h-prog" id="hProg" d="${d}"/>`+
-    segs.map((g,i)=>`<path d="${g}" fill="none" stroke="none" class="h-seg"/>`).join('')+
-    C.map((c,i)=>`<circle class="h-nodo" data-i="${i}" cx="${c[0]}" cy="${c[1]}" r="26"/>`).join('');
-  segEls=[...hilo.querySelectorAll('.h-seg')];ACUM=[0];segEls.forEach(p=>ACUM.push(ACUM[ACUM.length-1]+p.getTotalLength()));TOTAL=ACUM[ACUM.length-1];
-  const hp=document.getElementById('hProg');hp.style.strokeDasharray=TOTAL+' '+TOTAL;hp.style.strokeDashoffset=TOTAL;
-  mundo.querySelectorAll('.nebulosa').forEach(e=>e.remove());
-  const cols=['#f72585','#00e0c6','#ffc300','#3ec7ff','#c77dff','#ff4d6d'];
-  C.forEach((c,i)=>{if(i%2)return;const nb=document.createElement('div');nb.className='nebulosa';const r=Math.max(W,H)*1.3;
-    Object.assign(nb.style,{left:(c[0]-r/2+(i%4?W*.6:-W*.6))+'px',top:(c[1]-r/2+H*.7)+'px',width:r+'px',height:r+'px',background:`radial-gradient(circle,${cols[(i/2)%cols.length]} 0%,transparent 68%)`});
-    mundo.insertBefore(nb,hilo)});
+  geo.innerHTML=segs.map(g=>`<path d="${g}"/>`).join('');
+  segEls=[...geo.querySelectorAll('path')];ACUM=[0];segEls.forEach(p=>ACUM.push(ACUM[ACUM.length-1]+p.getTotalLength()));TOTAL=ACUM[ACUM.length-1];
+  PATH=new Path2D(d);
+  const xs=CENT.map(c=>c[0]),ys=CENT.map(c=>c[1]),m=Math.max(W,H)*2;
+  BB={x:Math.min(...xs)-m,y:Math.min(...ys)-m};BB.w=Math.max(...xs)+m-BB.x;BB.h=Math.max(...ys)+m-BB.y;
+  let sd=7;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647};
+  ESTR=[];for(let i=0;i<900;i++)ESTR.push([BB.x+rnd()*BB.w,BB.y+rnd()*BB.h,.6+rnd()*1.8,.35+rnd()*.6]);
+  const cols=['247,37,133','0,224,198','255,195,0','62,199,255','199,125,255','255,77,109'];
+  NEB=CENT.filter((_,i)=>i%2===0).map((c,k)=>[c[0]+(k%2?W*.7:-W*.7),c[1]+H*.8,Math.max(W,H)*.9,cols[k%cols.length]]);
 }
-function progresoHilo(n){const hp=document.getElementById('hProg');if(hp)hp.style.strokeDashoffset=TOTAL-ACUM[n];
-  hilo.querySelectorAll('.h-nodo').forEach(c=>c.classList.toggle('visto',+c.dataset.i<=n))}
+function dibujar(){
+  if(!PATH)return;
+  const {x,y,r,s}=CAM;
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);
+  ctx.translate(W/2,H/2);ctx.scale(s,s);ctx.rotate(-r*Math.PI/180);ctx.translate(-x,-y);
+  for(const [nx,ny,nr,c] of NEB){const g=ctx.createRadialGradient(nx,ny,0,nx,ny,nr);g.addColorStop(0,`rgba(${c},.32)`);g.addColorStop(1,`rgba(${c},0)`);ctx.fillStyle=g;ctx.fillRect(nx-nr,ny-nr,nr*2,nr*2)}
+  const vis=Math.max(W,H)/s;ctx.fillStyle='#fff';
+  for(const [sx,sy,sr,a] of ESTR){if(Math.abs(sx-x)>vis||Math.abs(sy-y)>vis)continue;ctx.globalAlpha=a;ctx.fillRect(sx,sy,sr/Math.max(s,.35),sr/Math.max(s,.35))}
+  ctx.globalAlpha=1;ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.strokeStyle='rgba(255,195,0,.13)';ctx.lineWidth=40;ctx.setLineDash([]);ctx.stroke(PATH);
+  ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=10;ctx.setLineDash([2,34]);ctx.stroke(PATH);
+  if(progVal>0){const g=ctx.createLinearGradient(BB.x,BB.y,BB.x+BB.w,BB.y+BB.h);
+    g.addColorStop(0,'#ffc300');g.addColorStop(.35,'#ff4d6d');g.addColorStop(.65,'#00e0c6');g.addColorStop(1,'#c77dff');
+    ctx.strokeStyle=g;ctx.lineWidth=14;ctx.setLineDash([progVal,TOTAL*2]);ctx.stroke(PATH)}
+  ctx.setLineDash([]);
+  CENT.forEach((c,i)=>{ctx.beginPath();ctx.arc(c[0],c[1],26,0,7);ctx.fillStyle=i<=visto?'#ffc300':'#10002b';ctx.fill();ctx.lineWidth=8;ctx.strokeStyle='#ffc300';ctx.stroke()});
+  if(VIA){const [vx,vy,va]=VIA,rr=34/Math.max(s,.2);const g=ctx.createRadialGradient(vx,vy,0,vx,vy,rr);
+    g.addColorStop(0,`rgba(255,255,255,${va})`);g.addColorStop(.3,`rgba(255,195,0,${va})`);g.addColorStop(.65,`rgba(247,37,133,${va*.5})`);g.addColorStop(1,'rgba(247,37,133,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(vx,vy,rr,0,7);ctx.fill()}
+}
+function progresoHilo(n){visto=n;progObj=ACUM[n];cancelAnimationFrame(rafP);const a=progVal,t0=performance.now(),d=1300;
+  (function f(t){const k=Math.max(0,Math.min((t-t0)/d,1)),e=1-Math.pow(1-k,3);progVal=a+(progObj-a)*e;if(!vueloEnCurso)dibujar();if(k<1)rafP=requestAnimationFrame(f)})(t0)}
+let vueloEnCurso=false;
 function volar(desde,n){
   if(!W)layout();
-  const fin=camSlide(n);
-  if(anim){anim.cancel();anim=null}
-  cancelAnimationFrame(rafV);viajero.style.opacity=0;
-  if(desde===null||matchMedia('(prefers-reduced-motion: reduce)').matches){mundo.style.transform=fin;progresoHilo(n);return 0}
-  const [ax,ay]=centro(desde),[bx,by]=centro(n),dist=Math.hypot(bx-ax,by-ay);
-  let mx=(ax+bx)/2,my=(ay+by)/2;const vecino=Math.abs(n-desde)===1,seg=segEls[Math.min(n,desde)];
-  if(vecino&&seg){const pt=seg.getPointAtLength(seg.getTotalLength()/2);mx=pt.x;my=pt.y}
-  const sMid=Math.max(.08,Math.min(.3,.8*W/(dist+W*1.2))),rMid=(POS[desde].r+POS[n].r)/2;
-  const dur=vecino?DUR:DUR+500;
-  anim=mundo.animate([{transform:camSlide(desde),easing:'cubic-bezier(.55,0,.45,1)'},{transform:cam(mx,my,rMid,sMid),easing:'cubic-bezier(.55,0,.45,1)',offset:.5},{transform:fin}],{duration:dur});
-  mundo.style.transform=fin;
-  setTimeout(()=>progresoHilo(n),dur*.25);
-  if(vecino&&seg){const L=seg.getTotalLength(),ida=n>desde,t0=performance.now();viajero.style.opacity=1;
-    (function mover(t){let k=Math.min((t-t0)/dur,1);const e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
-      const p=seg.getPointAtLength(L*(ida?e:1-e));viajero.style.transform=`translate(${p.x}px,${p.y}px) scale(${1/Math.max(sMid,.25)})`;
-      viajero.style.opacity=k<.9?1:(1-k)*10;if(k<1)rafV=requestAnimationFrame(mover)})(t0)}
+  vueloTok++;const tok=vueloTok;cancelAnimationFrame(rafV);VIA=null;
+  const [bx,by]=centro(n),rB=POS[n].r;
+  const reducido=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(desde===null||reducido){vueloEnCurso=false;progresoHilo(n);fijarCam(bx,by,rB,1);slides.forEach(s=>s.classList.remove('lejos'));return 0}
+  const ax=CAM.x,ay=CAM.y,rA=CAM.r,sA=CAM.s;
+  const dist=Math.hypot(bx-ax,by-ay),vecino=Math.abs(n-desde)===1,seg=vecino?segEls[Math.min(n,desde)]:null,L=seg?seg.getTotalLength():0,ida=n>desde;
+  const sMid=Math.max(.1,Math.min(.42,.9*W/(dist+W*1.1))),dur=vecino?1500:2100;
+  const ver=new Set([desde,n,desde-1,desde+1,n-1,n+1]);
+  slides.forEach((s,i)=>s.classList.toggle('lejos',vecino&&!ver.has(i)));
+  mundo.style.willChange='transform';vueloEnCurso=true;
+  const ease=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
+  const t0=performance.now();
+  setTimeout(()=>{if(tok===vueloTok)progresoHilo(n)},dur*.15);
+  function paso(t){
+    if(tok!==vueloTok)return;
+    const k=Math.max(0,Math.min((t-t0)/dur,1)),e=ease(k),w=Math.sin(Math.PI*k);
+    let x=ax+(bx-ax)*e,y=ay+(by-ay)*e;
+    if(seg){const pt=seg.getPointAtLength(L*(ida?e:1-e));x=pt.x*w+x*(1-w);y=pt.y*w+y*(1-w)}
+    const sBase=sA+(1-sA)*e,s=sBase*Math.pow(sMid,Math.pow(w,1.4)),r=rA+(rB-rA)*e;
+    VIA=seg?[x,y,Math.min(1,w*3)]:null;
+    fijarCam(x,y,r,s);
+    if(k<1)rafV=requestAnimationFrame(paso);
+    else{VIA=null;vueloEnCurso=false;fijarCam(bx,by,rB,1);mundo.style.willChange='auto';slides.forEach(s=>s.classList.remove('lejos'))}
+  }
+  rafV=requestAnimationFrame(paso);
   return dur;
 }
-addEventListener('resize',()=>{layout();if(anim){anim.cancel();anim=null}mundo.style.transform=camSlide(actual);progresoHilo(actual)});
+addEventListener('resize',()=>{vueloTok++;vueloEnCurso=false;VIA=null;layout();progVal=ACUM[actual];fijarCam(...centro(actual),POS[actual].r,1)});
 prepararImpresion();layout();
 ir(0);
 </script>
