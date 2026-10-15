@@ -529,6 +529,40 @@ p,li{color:#f1e9ff}
  .enlace-pdf a{font-size:18px;font-weight:600;color:#6ff7e2;text-decoration:underline;word-break:break-all}
  .birrete-salto{width:150px!important}.gracias-txt{font-size:130px!important}
 }
+
+.final-cont{width:100%;max-width:1100px}
+.concl-tit{text-align:center;margin:8px 0 16px!important;font-size:clamp(1.4rem,3vw,2.4rem)!important}
+.concl-niv{width:100%;text-align:left}
+.concl-niv .nivel{padding:16px 18px!important}
+.concl-frase{font-family:'Lora',Georgia,serif;font-style:italic;font-size:clamp(1rem,1.8vw,1.35rem)!important;color:#fff!important;margin:16px auto 4px;max-width:860px}
+.slide.final .gracias-txt{font-size:clamp(2.8rem,7vw,5.2rem)!important;margin:4px 0 8px!important}
+.slide.final{padding-top:30px!important;padding-bottom:84px!important}
+@media print{.slide.final .gracias-txt{font-size:76px!important}.concl-tit{font-size:34px!important}.enlace-pdf{margin-top:12px!important}
+ .enlace-pdf .qr{width:80px!important;height:80px!important}.concl-frase{font-size:18px!important}}
+@media (max-width:820px){.slide.final{justify-content:flex-start!important;padding-top:64px!important;overflow-y:auto!important}}
+
+.slide.denso{justify-content:flex-start!important;padding-top:58px!important}
+.slide.denso h2{font-size:clamp(1.5rem,3.2vw,2.5rem)!important;margin-bottom:10px!important}
+.slide.denso .ilus{width:clamp(90px,11vw,150px)!important}
+.slide.denso .card{padding:clamp(10px,1.4vw,18px)!important}
+.slide.denso .num{font-size:clamp(1.8rem,3.6vw,2.8rem)!important}
+.slide.denso p,.slide.denso li{font-size:clamp(.9rem,1.45vw,1.1rem)!important}
+.slide.final .gracias-txt{margin-top:14px!important}
+@media print{.slide.denso{justify-content:center!important}}
+.pregunta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;align-self:flex-start;max-width:900px;margin-bottom:12px;
+  background:linear-gradient(90deg,rgba(255,195,0,.2),rgba(255,195,0,.06));border:1.5px solid #ffc300;border-radius:14px;padding:8px 14px;
+  box-shadow:0 0 22px -6px rgba(255,195,0,.7)}
+.pq-num{background:#ffc300;color:#10002b;font-weight:800;font-size:clamp(.75rem,1.2vw,.9rem);letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:999px;text-shadow:none}
+.pq-niv{color:#ffd166;font-weight:700;font-size:clamp(.75rem,1.2vw,.9rem);text-transform:uppercase;letter-spacing:.1em}
+.pq-txt{flex-basis:100%;color:#fff!important;font-size:clamp(.82rem,1.3vw,1rem);line-height:1.4;font-weight:500}
+.slide.denso .pregunta{margin-bottom:8px;padding:6px 12px}
+.pagina{position:absolute;right:26px;bottom:22px;z-index:3;font:700 .85rem 'Poppins',sans-serif;color:rgba(255,255,255,.75);
+  background:rgba(16,0,43,.6);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:3px 11px}
+.pagina.estrella{color:#10002b;background:#ffc300;border-color:#ffc300;box-shadow:0 0 14px rgba(255,195,0,.6)}
+.slide.final .pagina{right:80px}
+.mm-item .n.q{background:#ffc300!important;color:#10002b!important}
+.mm-star{color:#ffc300;margin-left:4px}
+@media print{.pagina{right:30px;bottom:24px;font-size:14px}.pq-txt{font-size:15px!important}}
 </style>
 </head>
 <body>
@@ -537,6 +571,18 @@ p,li{color:#f1e9ff}
 <button class="btn-pdf" id="btnPdf" title="Descargar en PDF">⬇ <span class="txt">Descargar PDF</span></button>
 <div class="aviso-pdf" id="avisoPdf"><b>📄 Guardar en PDF (alta calidad)</b>En la ventana que se abre, en <b style="display:inline">Destino</b> elige <b style="display:inline">"Guardar como PDF"</b> y pulsa Guardar. Cada diapositiva sale en una página.<br><button id="btnPdfOk">Continuar</button></div>
 
+<div hidden id="grafOculto">
+  <div class="graf a">
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <p class="graf-tit" id="grafTit"></p>
+    <div class="barras" id="barras"></div>
+    <div class="graf-pie"><span id="grafFuente" class="cita"></span><button class="btn-tabla" id="btnTabla">Ver tabla</button></div>
+    <table class="tabla" id="tabla" hidden><thead><tr><th>Indicador</th><th>Valor</th></tr></thead><tbody></tbody></table>
+    <p class="pista">👆 Toca o pasa el cursor sobre cada barra</p>
+  </div>
+  <div class="solo-print" id="soloPrint"></div>
+  <div class="tip" id="tip"></div>
+</div>
 <canvas id="lienzo"></canvas><svg id="geo" xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"></svg><main class="deck" id="deck"><div class="mundo" id="mundo">
 
 <!-- 1 PORTADA -->
@@ -557,10 +603,12 @@ p,li{color:#f1e9ff}
     <p class="pt-lugar">David, Chiriquí<br>Octubre 2026</p>
   </div>
   <div class="pt-tira"><div class="pt-tira-in"><span>Respeto</span><b>✶</b><span>Responsabilidad</span><b>✶</b><span>Competencias</span><b>✶</b><span>Orientación</span><b>✶</b><span>Inclusión</span><b>✶</b><span>Calidad</span><b>✶</b><span>Trabajo</span><b>✶</b><span>Valores</span><b>✶</b><span>Respeto</span><b>✶</b><span>Responsabilidad</span><b>✶</b><span>Competencias</span><b>✶</b><span>Orientación</span><b>✶</b><span>Inclusión</span><b>✶</b><span>Calidad</span><b>✶</b><span>Trabajo</span><b>✶</b><span>Valores</span><b>✶</b></div></div>
+<div class="pagina">1</div>
 </section>
 <!-- 2 ESTRUCTURA -->
+
 <section class="slide" data-tr="cubo">
-  <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--turq)">Hoja de ruta</span><h2 >Tres miradas a la <span class="grad">Educación Media</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
+  <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--turq)">Las tres preguntas</span><h2 >Tres miradas a la <span class="grad">Educación Media</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
 <path d="M20 140 C60 140 40 90 90 90 S130 40 180 30" fill="none" stroke="#fdf8ff" stroke-width="6" stroke-dasharray="1 12" stroke-linecap="round"/>
 <g><circle cx="34" cy="138" r="14" fill="#f5b82e"/><text x="34" y="143" font-family="Poppins" font-weight="800" font-size="13" text-anchor="middle" fill="#1a0b2e">I</text></g>
 <g><circle cx="94" cy="90" r="14" fill="#ff6b6b"/><text x="94" y="95" font-family="Poppins" font-weight="800" font-size="13" text-anchor="middle" fill="#1a0b2e">II</text></g>
@@ -570,28 +618,20 @@ p,li{color:#f1e9ff}
     <div class="nivel" style="background:linear-gradient(135deg,var(--coral),#ff9f9f)"><div class="n">II</div><h3>Proyección pedagógica</h3><p>Dos características del perfil del docente de Media.</p></div>
     <div class="nivel" style="background:linear-gradient(135deg,var(--turq),var(--cielo))"><div class="n">III</div><h3>Nivel institucional</h3><p>Tres desafíos para los colegios del nivel medio.</p></div>
   </div>
+  <div class="grid g4 a" style="margin-top:18px">
+    <div class="card" style="--c:var(--oro)"><h3>Art. 81</h3><p>Gratuita, diversificada y de tres años.</p></div>
+    <div class="card" style="--c:var(--coral)"><h3>Art. 83</h3><p>Prepara para el trabajo y los estudios superiores.</p></div>
+    <div class="card" style="--c:var(--turq)"><h3>Art. 10</h3><p>Desarrollo integral, democracia y formación cívica.</p></div>
+    <div class="card" style="--c:var(--cielo)"><h3>Art. 303</h3><p>Profundiza en valores y principios éticos.</p></div>
+  </div>
+  <p class="a" style="margin-top:10px"><span class="cita">Ley Orgánica de Educación (República de Panamá, 2004)</span></p>
+<div class="pagina">2</div>
 </section>
 
 <!-- 3 MARCO -->
-<section class="slide" data-tr="sube">
-  <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--lila)">Punto de partida</span><h2 >¿Qué dice la <span class="grad2">Ley Orgánica</span>?</h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
-<line x1="100" y1="20" x2="100" y2="138" stroke="#f5b82e" stroke-width="6"/><rect x="66" y="132" width="68" height="10" rx="4" fill="#f5b82e"/>
-<line x1="40" y1="44" x2="160" y2="44" stroke="#f5b82e" stroke-width="6" stroke-linecap="round"/><circle cx="100" cy="22" r="8" fill="#f5b82e"/>
-<line x1="40" y1="44" x2="24" y2="92" stroke="#fdf8ff" stroke-width="2"/><line x1="40" y1="44" x2="56" y2="92" stroke="#fdf8ff" stroke-width="2"/>
-<line x1="160" y1="44" x2="144" y2="92" stroke="#fdf8ff" stroke-width="2"/><line x1="160" y1="44" x2="176" y2="92" stroke="#fdf8ff" stroke-width="2"/>
-<path d="M18 92 H62 Q40 112 18 92Z" fill="#22d3b6"/><path d="M138 92 H182 Q160 112 138 92Z" fill="#ff6b6b"/></svg></div></div>
-  <div class="grid g2 a">
-    <div class="card" style="--c:var(--oro)"><div class="ico">🎓</div><h3>Art. 81</h3><p>La Media es gratuita, diversificada y dura tres años.</p></div>
-    <div class="card" style="--c:var(--coral)"><div class="ico">🎯</div><h3>Art. 83</h3><p>Prepara para el trabajo productivo y para continuar estudios superiores.</p></div>
-    <div class="card" style="--c:var(--turq)"><div class="ico">🤝</div><h3>Art. 10</h3><p>Fines: desarrollo integral, democracia, derechos humanos y formación cívica.</p></div>
-    <div class="card" style="--c:var(--cielo)"><div class="ico">💡</div><h3>Art. 303</h3><p>El currículo de la Media profundiza en valores y principios éticos.</p></div>
-  </div>
-  <p class="a" style="margin-top:16px"><span class="cita">(República de Panamá, 2004)</span></p>
-</section>
 
-<!-- 4 RESPETO -->
 <section class="slide" data-tr="gira">
-  <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--oro)">I · Nivel personal</span><h2 >Valor 1: <span class="grad">El respeto</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
+  <div class="cabeza a"><div class="tit"><div class="pregunta"><span class="pq-num">★ Pregunta I</span><span class="pq-niv">Nivel personal</span><span class="pq-txt">Dos valores del Código de Ética necesarios para la realización del docente en la Educación Media.</span></div><h2 >Valor 1: <span class="grad">El respeto</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
 <path d="M100 140 C25 95 30 32 72 34 C88 35 98 46 100 54 C102 46 112 35 128 34 C170 32 175 95 100 140Z" fill="#ff6b6b"/>
 <path d="M100 122 C52 92 56 52 80 52 C90 52 97 60 100 66 C103 60 110 52 120 52 C144 52 148 92 100 122Z" fill="#f5b82e" opacity=".85"/>
 <g transform="translate(78,74) scale(0.8)"><circle cx="0" cy="0" r="9" fill="#c68642"/><path d="M-9-3 Q0-14 9-3 Q4-9 0-9 Q-4-9-9-3Z" fill="#2b1a10"/><path d="M-14 32 Q-14 12 0 12 Q14 12 14 32Z" fill="#22d3b6"/></g><g transform="translate(122,74) scale(0.8)"><circle cx="0" cy="0" r="9" fill="#f1c27d"/><path d="M-9-3 Q0-14 9-3 Q4-9 0-9 Q-4-9-9-3Z" fill="#2b1a10"/><path d="M-14 32 Q-14 12 0 12 Q14 12 14 32Z" fill="#4cc9f0"/></g></svg></div></div>
@@ -604,10 +644,12 @@ p,li{color:#f1e9ff}
       <div class="num" style="--c:var(--coral);margin-top:12px" data-n="3.7" data-d="1">0<small>%</small></div>
       <p>de la matrícula de Media es indígena <span class="cita">(MEDUCA, 2014)</span>. Nuestras aulas son diversas y desiguales.</p></div>
   </div>
+<div class="pagina estrella">3 ★</div>
 </section>
 
 <!-- 5 RESPONSABILIDAD -->
-<section class="slide" data-tr="voltea">
+
+<section class="slide denso" data-tr="voltea">
   <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--oro)">I · Nivel personal</span><h2 >Valor 2: <span class="grad">La responsabilidad</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
 <rect x="30" y="22" width="92" height="122" rx="8" fill="#fdf8ff"/><rect x="58" y="14" width="36" height="16" rx="5" fill="#9b1b45"/>
 <g stroke-linecap="round" stroke-width="5" fill="none"><polyline points="44,54 52,62 66,46" stroke="#22d3b6"/><polyline points="44,84 52,92 66,76" stroke="#22d3b6"/><polyline points="44,114 52,122 66,106" stroke="#22d3b6"/></g>
@@ -619,42 +661,15 @@ p,li{color:#f1e9ff}
     <div class="card" style="--c:var(--coral)"><div class="num" style="--c:var(--coral)" data-n="30" data-pre="+">0<small>%</small></div><p>de aspirantes no pasa las pruebas de ingreso a la universidad <span class="cita">(Bernal, 2020)</span></p></div>
     <div class="card" style="--c:var(--lila)"><div class="num" style="--c:var(--lila)">4D</div><p>Desactualización, descontextualización, discontinuidad y disfuncionalidad en la formación continua</p></div>
   </div>
-  <p class="a" style="margin-top:18px">✅ Capacitarse, dar seguimiento al rendimiento, evaluar a tiempo y comunicarse con los acudientes <span class="cita">(MEDUCA, 2012)</span>.</p>
+  <p class="a" style="margin-top:14px">💡 <b style="color:#fff">Propuesta:</b> plan personal de capacitación, autoevaluación cada trimestre y normas de convivencia acordadas con el grupo.</p>
+  <div class="caso a" style="margin-top:12px"><p><b>📖 Experiencia real:</b> en el Colegio Victoriano Lorenzo, una profesora trataba a los estudiantes con desprecio y le dijo a una alumna con problemas familiares que no podía "resolverle la vida". El resultado: un grupo que rechazaba la materia y una alumna sin apoyo. Es lo contrario de lo que pide el Código <span class="cita">(MEDUCA, 2012)</span>.</p></div>
+<div class="pagina">4</div>
 </section>
 
 <!-- 6 CASO + PROPUESTA I -->
-<section class="slide" data-tr="desliza">
-  <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--oro)">I · Valoración</span><h2 >Respeto + responsabilidad <span class="grad">van de la mano</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
-<path d="M100 140 C25 95 30 32 72 34 C88 35 98 46 100 54 C102 46 112 35 128 34 C170 32 175 95 100 140Z" fill="#ff6b6b"/>
-<path d="M100 122 C52 92 56 52 80 52 C90 52 97 60 100 66 C103 60 110 52 120 52 C144 52 148 92 100 122Z" fill="#f5b82e" opacity=".85"/>
-<g transform="translate(78,74) scale(0.8)"><circle cx="0" cy="0" r="9" fill="#c68642"/><path d="M-9-3 Q0-14 9-3 Q4-9 0-9 Q-4-9-9-3Z" fill="#2b1a10"/><path d="M-14 32 Q-14 12 0 12 Q14 12 14 32Z" fill="#22d3b6"/></g><g transform="translate(122,74) scale(0.8)"><circle cx="0" cy="0" r="9" fill="#f1c27d"/><path d="M-9-3 Q0-14 9-3 Q4-9 0-9 Q-4-9-9-3Z" fill="#2b1a10"/><path d="M-14 32 Q-14 12 0 12 Q14 12 14 32Z" fill="#4cc9f0"/></g></svg></div></div>
-  <div class="grid g3 a">
-    <div class="card" style="--c:var(--turq)"><div class="ico">🗓️</div><h3>Plan personal</h3><p>Capacitación con metas verificables, apoyada en las redes docentes.</p></div>
-    <div class="card" style="--c:var(--cielo)"><div class="ico">🪞</div><h3>Autoevaluación</h3><p>Cada trimestre: ¿a quién estoy dejando atrás?</p></div>
-    <div class="card" style="--c:var(--lila)"><div class="ico">🤝</div><h3>Normas en conjunto</h3><p>Acordar la convivencia con el grupo desde la primera semana.</p></div>
-  </div>
-  <div class="caso a"><p><b>📖 Experiencia real:</b> en el Colegio Victoriano Lorenzo, una profesora trataba a los estudiantes con desprecio y le dijo a una alumna con problemas familiares que no podía "resolverle la vida". El resultado fue un grupo que rechazaba la materia y una alumna sin apoyo.</p></div>
-</section>
 
-<!-- 7 NUEVO ROL -->
-<section class="slide" data-tr="zoom">
-  <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--coral)">II · Proyección pedagógica</span><h2 >El <span class="grad">nuevo rol</span> del docente</h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
-<rect x="60" y="20" width="128" height="84" rx="6" fill="#1f5c4b" stroke="#f5b82e" stroke-width="4"/>
-<polyline points="74,88 98,66 120,76 148,44 172,52" fill="none" stroke="#fdf8ff" stroke-width="3" stroke-linecap="round"/>
-<circle cx="148" cy="44" r="4" fill="#f5b82e"/><line x1="40" y1="60" x2="74" y2="70" stroke="#f5b82e" stroke-width="3" stroke-linecap="round"/>
-<g transform="translate(32,96) scale(1.4)"><circle cx="0" cy="0" r="9" fill="#f1c27d"/><path d="M-9-3 Q0-14 9-3 Q4-9 0-9 Q-4-9-9-3Z" fill="#2b1a10"/><path d="M-14 32 Q-14 12 0 12 Q14 12 14 32Z" fill="#ff6b6b"/></g><g transform="translate(110,128) scale(0.75)"><circle cx="0" cy="0" r="9" fill="#8d5524"/><path d="M-9-3 Q0-14 9-3 Q4-9 0-9 Q-4-9-9-3Z" fill="#2b1a10"/><path d="M-14 32 Q-14 12 0 12 Q14 12 14 32Z" fill="#22d3b6"/></g><g transform="translate(140,128) scale(0.75)"><circle cx="0" cy="0" r="9" fill="#e0ac69"/><path d="M-9-3 Q0-14 9-3 Q4-9 0-9 Q-4-9-9-3Z" fill="#2b1a10"/><path d="M-14 32 Q-14 12 0 12 Q14 12 14 32Z" fill="#4cc9f0"/></g><g transform="translate(170,128) scale(0.75)"><circle cx="0" cy="0" r="9" fill="#c68642"/><path d="M-9-3 Q0-14 9-3 Q4-9 0-9 Q-4-9-9-3Z" fill="#2b1a10"/><path d="M-14 32 Q-14 12 0 12 Q14 12 14 32Z" fill="#b388ff"/></g></svg></div></div>
-  <div class="vs a">
-    <div class="card" style="--c:var(--suave)"><h3>😴 Antes</h3><p>El profesor era el centro de la clase y transmitía contenidos para memorizar.</p></div>
-    <div class="flecha">➜</div>
-    <div class="card" style="--c:var(--turq)"><h3>🚀 Ahora</h3><p>Es guía, tutor y diseñador de experiencias de aprendizaje <span class="cita">(MEDUCA, 2014)</span>.</p></div>
-  </div>
-  <div class="caso a" style="background:linear-gradient(120deg,rgba(34,211,182,.18),rgba(76,201,240,.14));border-color:rgba(34,211,182,.6)">
-    <p><b style="color:var(--turq)">🆕 Rediseño curricular 2026:</b> de preescolar a duodécimo, con habilidades socioemocionales y emprendimiento <span class="cita">(Ruíz, 2025)</span>.</p></div>
-</section>
-
-<!-- 8 MEDIADOR -->
-<section class="slide" data-tr="cubo">
-  <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--coral)">II · Característica 1</span><h2 >Mediador del aprendizaje <span class="grad">por competencias</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
+<section class="slide denso" data-tr="cubo">
+  <div class="cabeza a"><div class="tit"><div class="pregunta"><span class="pq-num">★ Pregunta II</span><span class="pq-niv">Proyección pedagógica</span><span class="pq-txt">Dos características pedagógicas del docente de Media según la Ley Orgánica y el nuevo rol (2014 / 2026).</span></div><h2 >Mediador del aprendizaje <span class="grad">por competencias</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
 <rect x="20" y="30" width="110" height="76" rx="8" fill="#2a2140" stroke="#4cc9f0" stroke-width="4"/>
 <rect x="30" y="40" width="90" height="56" rx="4" fill="#4cc9f0" opacity=".35"/>
 <text x="75" y="76" font-family="monospace" font-size="20" font-weight="bold" fill="#fdf8ff" text-anchor="middle">&lt;/&gt;</text>
@@ -662,6 +677,7 @@ p,li{color:#f1e9ff}
 <rect x="142" y="46" width="40" height="92" rx="6" fill="#b388ff"/><circle cx="162" cy="66" r="6" fill="#fdf8ff"/>
 <rect x="150" y="84" width="24" height="5" rx="2" fill="#fdf8ff" opacity=".7"/><rect x="150" y="94" width="24" height="5" rx="2" fill="#fdf8ff" opacity=".7"/>
 <g transform="translate(150,26) rotate(35)"><rect x="-4" y="0" width="8" height="34" rx="3" fill="#f5b82e"/><circle cx="0" cy="0" r="9" fill="none" stroke="#f5b82e" stroke-width="5"/></g></svg></div></div>
+  <p class="a" style="margin-bottom:14px">🔄 <b style="color:#fff">Nuevo rol:</b> el docente deja de ser el centro que transmite contenidos y pasa a ser guía y diseñador de experiencias <span class="cita">(MEDUCA, 2014)</span>. El rediseño 2026 suma habilidades socioemocionales y emprendimiento <span class="cita">(Ruíz, 2025)</span>.</p>
   <div class="grid g2 a">
     <div class="card" style="--c:var(--coral)"><div class="num" style="--c:var(--coral)" data-n="8" data-suf=" de 10">0</div><p>estudiantes de 15 años no alcanzan el nivel mínimo en matemática <span class="cita">(UNICEF, s.f.)</span></p></div>
     <div class="card" style="--c:var(--cielo)"><div class="num" style="--c:var(--cielo)" data-n="60">0<small>%</small></div><p>de los estudiantes dijo que debía mejorar en el manejo de la información digital <span class="cita">(Bernal, 2020)</span></p></div>
@@ -671,9 +687,11 @@ p,li{color:#f1e9ff}
     <div class="card" style="--c:var(--oro)"><h3>📊 Comercio</h3><p>Simular una microempresa con hojas de cálculo.</p></div>
     <div class="card" style="--c:var(--lila)"><h3>🖥️ Informática</h3><p>Armar computadoras en clase y darles mantenimiento en el servicio social (experiencia real en el Victoriano Lorenzo).</p></div>
   </div>
+<div class="pagina estrella">5 ★</div>
 </section>
 
 <!-- 9 ORIENTADOR -->
+
 <section class="slide" data-tr="sube">
   <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--coral)">II · Característica 2</span><h2 >Orientador y <span class="grad">formador integral</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
 <path d="M10 140 Q60 100 100 118 T190 70" fill="none" stroke="#22d3b6" stroke-width="5" stroke-dasharray="2 10" stroke-linecap="round"/>
@@ -690,11 +708,13 @@ p,li{color:#f1e9ff}
       <ul class="lista"><li>Ayuda a elegir entre universidad, carrera técnica o trabajo.</li><li>Detecta las ausencias y habla con la familia.</li><li>Convierte el servicio social en un proyecto real (art. 346).</li></ul></div>
   </div>
   <p class="a" style="margin-top:16px">💬 <b style="color:var(--txt)">Propuesta:</b> un proyecto por trimestre con rúbrica, horas de consejería en el horario y planeamientos compartidos.</p>
+<div class="pagina">6</div>
 </section>
 
 <!-- 10 DESAFÍO 1 -->
+
 <section class="slide" data-tr="gira">
-  <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--turq)">III · Desafío 1</span><h2 >Una escuela <span class="grad2">conectada con el trabajo</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
+  <div class="cabeza a"><div class="tit"><div class="pregunta"><span class="pq-num">★ Pregunta III</span><span class="pq-niv">Nivel institucional</span><span class="pq-txt">Tres desafíos para la escuela media: formar para el trabajo, como ciudadano con valores y para estudios superiores (art. 83).</span></div><h2 >Una escuela <span class="grad2">conectada con el trabajo</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
 <g transform="translate(150,52)"><circle r="30" fill="#22d3b6"/><circle r="12" fill="#2a2140"/>
 <g fill="#22d3b6"><rect x="-7" y="-40" width="14" height="14" rx="3"/><rect x="-7" y="26" width="14" height="14" rx="3"/><rect x="-40" y="-7" width="14" height="14" rx="3"/><rect x="26" y="-7" width="14" height="14" rx="3"/></g></g>
 <rect x="24" y="66" width="120" height="76" rx="10" fill="#9b1b45"/><rect x="62" y="52" width="44" height="18" rx="6" fill="none" stroke="#9b1b45" stroke-width="6"/>
@@ -705,9 +725,11 @@ p,li{color:#f1e9ff}
   </div>
   <ul class="lista a" style="margin-top:16px"><li>Convenios con empresas y universidades de la zona (arts. 84 y 85).</li><li>Prácticas planificadas desde décimo y seguimiento a egresados.</li></ul>
   <div class="caso a"><p><b>📍 Victoriano Lorenzo (Las Lomas, David):</b> ofrece dos bachilleratos de Informática, una oferta acorde con un distrito comercial y de servicios. Pero quien termina a distancia puede quedarse sin práctica profesional.</p></div>
+<div class="pagina estrella">7 ★</div>
 </section>
 
 <!-- 11 DESAFÍO 2 -->
+
 <section class="slide" data-tr="voltea">
   <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--turq)">III · Desafío 2</span><h2 >Una escuela <span class="grad2">inclusiva</span> que retiene</h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
 <circle cx="100" cy="70" r="62" fill="#b388ff" opacity=".18"/>
@@ -719,9 +741,11 @@ p,li{color:#f1e9ff}
   </div>
   <ul class="lista a" style="margin-top:16px"><li>Alerta temprana: asistencia, notas y situación familiar.</li><li>Apoyo a estudiantes indígenas, rurales y embarazadas.</li></ul>
   <div class="caso a"><p><b>📖 Experiencia real:</b> uno de nosotros trabajaba y terminó el último año en el ICED, una modalidad a distancia. Sin esa opción, muchos jóvenes abandonan.</p></div>
+<div class="pagina">8</div>
 </section>
 
 <!-- 12 DESAFÍO 3 -->
+
 <section class="slide" data-tr="desliza">
   <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--turq)">III · Desafío 3</span><h2 >Una escuela <span class="grad2">de calidad</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
 <rect x="30" y="72" width="140" height="74" rx="4" fill="#fdf8ff"/><polygon points="18,76 100,32 182,76" fill="#9b1b45"/>
@@ -737,51 +761,29 @@ p,li{color:#f1e9ff}
   </div>
   <p class="a" style="margin-top:14px">🛠️ Plan de mejora anual, nivelación en lectura y matemática, tecnología en clase y convenios con universidades.</p>
   <div class="caso a"><p><b>📖 Experiencia real:</b> después del ICED, uno de nosotros entró a la UDI y la dejó en segundo año por trabajo. Años después terminó la licenciatura en OTEIMA.</p></div>
+<div class="pagina">9</div>
 </section>
 
 <!-- 13 CONCLUSIÓN -->
-<section class="slide" data-tr="sube">
-  <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--cielo)">Gráfica interactiva</span><h2>Panamá <span class="grad2">en cifras</span></h2></div></div>
-  <div class="graf a">
-    <div class="tabs" id="tabs" role="tablist"></div>
-    <p class="graf-tit" id="grafTit"></p>
-    <div class="barras" id="barras"></div>
-    <div class="graf-pie"><span id="grafFuente" class="cita"></span><button class="btn-tabla" id="btnTabla">Ver tabla</button></div>
-    <table class="tabla" id="tabla" hidden><thead><tr><th>Indicador</th><th>Valor</th></tr></thead><tbody></tbody></table>
-    <p class="pista">👆 Toca o pasa el cursor sobre cada barra</p>
-  </div>
-  <div class="solo-print" id="soloPrint"></div>
-  <div class="tip" id="tip"></div>
-</section>
 
-<section class="slide" data-tr="zoom">
-  <div class="cabeza a"><div class="tit"><span class="etiqueta" style="background:var(--lila)">Conclusión</span><h2 >El éxito de la Media necesita <span class="grad">tres piezas juntas</span></h2></div><div class="ilus"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
-<g opacity=".92"><circle cx="76" cy="62" r="44" fill="#f5b82e"/><circle cx="124" cy="62" r="44" fill="#ff6b6b" style="mix-blend-mode:screen"/>
-<circle cx="100" cy="102" r="44" fill="#22d3b6" style="mix-blend-mode:screen"/></g>
-<circle cx="100" cy="76" r="10" fill="#fdf8ff"/></svg></div></div>
-  <div class="niveles a">
+<section class="slide final" data-tr="zoom">
+  <canvas id="fuegos"></canvas>
+  <div class="final-cont">
+    <span class="etiqueta" style="background:var(--lila);align-self:center">Conclusión</span>
+    <h2 class="concl-tit">El éxito de la Media necesita <span class="grad">tres piezas juntas</span></h2>
+  <div class="niveles concl-niv">
     <div class="nivel" style="background:linear-gradient(135deg,var(--oro),#ffd76a)"><div class="ico">💛</div><h3>Ética del docente</h3><p>Respeto y responsabilidad</p></div>
     <div class="nivel" style="background:linear-gradient(135deg,var(--coral),#ff9f9f)"><div class="ico">🧭</div><h3>Perfil pedagógico</h3><p>Mediador y orientador</p></div>
     <div class="nivel" style="background:linear-gradient(135deg,var(--turq),var(--cielo))"><div class="ico">🏫</div><h3>Colegio con recursos</h3><p>Pertinente, inclusivo y de calidad</p></div>
   </div>
-  <p class="a" style="margin-top:22px;font-family:'Lora',serif;font-style:italic;font-size:clamp(1.05rem,2vw,1.5rem);color:var(--txt)">"Detrás de cada cifra hay jóvenes con historias reales."</p>
-</section>
-
-<!-- 14 REFERENCIAS -->
-<section class="slide final" data-tr="zoom">
-  <canvas id="fuegos"></canvas>
-  <div class="final-cont">
-    <div class="ilus birrete-salto"><svg viewBox="0 0 200 160"><ellipse cx="100" cy="150" rx="88" ry="7" fill="#000" opacity=".25"/>
-<rect x="38" y="120" width="124" height="20" rx="4" fill="#22d3b6"/><rect x="48" y="102" width="108" height="18" rx="4" fill="#ff6b6b"/>
-<rect x="42" y="84" width="116" height="18" rx="4" fill="#4cc9f0"/>
-<polygon points="100,22 172,46 100,70 28,46" fill="#2a2140"/><path d="M62 58 V74 Q100 92 138 74 V58 L100 70Z" fill="#2a2140"/>
-<line x1="160" y1="46" x2="160" y2="80" stroke="#f5b82e" stroke-width="3"/><circle cx="160" cy="82" r="5" fill="#f5b82e"/></svg></div>
+    <p class="concl-frase">Ninguna reforma da resultados sin docentes formados y colegios con recursos. Detrás de cada cifra hay jóvenes con historias reales.</p>
     <h1 class="gracias-txt"><span style="--i:0">¡</span><span style="--i:1">G</span><span style="--i:2">r</span><span style="--i:3">a</span><span style="--i:4">c</span><span style="--i:5">i</span><span style="--i:6">a</span><span style="--i:7">s</span><span style="--i:8">!</span></h1>
-    <p class="sub-final">¿Preguntas o comentarios?</p>
     <div class="chips" style="justify-content:center"><span class="chip brilla">Davis Fernández</span><span class="chip brilla">Erick Santos</span></div>
     <div class="enlace-pdf"><div class="qr"><svg width="41mm" height="41mm" version="1.1" viewBox="0 0 41 41" xmlns="http://www.w3.org/2000/svg"><path d="M2,2H3V3H2zM3,2H4V3H3zM4,2H5V3H4zM5,2H6V3H5zM6,2H7V3H6zM7,2H8V3H7zM8,2H9V3H8zM10,2H11V3H10zM12,2H13V3H12zM13,2H14V3H13zM14,2H15V3H14zM15,2H16V3H15zM16,2H17V3H16zM18,2H19V3H18zM19,2H20V3H19zM21,2H22V3H21zM22,2H23V3H22zM24,2H25V3H24zM26,2H27V3H26zM32,2H33V3H32zM33,2H34V3H33zM34,2H35V3H34zM35,2H36V3H35zM36,2H37V3H36zM37,2H38V3H37zM38,2H39V3H38zM2,3H3V4H2zM8,3H9V4H8zM12,3H13V4H12zM13,3H14V4H13zM15,3H16V4H15zM20,3H21V4H20zM22,3H23V4H22zM26,3H27V4H26zM30,3H31V4H30zM32,3H33V4H32zM38,3H39V4H38zM2,4H3V5H2zM4,4H5V5H4zM5,4H6V5H5zM6,4H7V5H6zM8,4H9V5H8zM10,4H11V5H10zM11,4H12V5H11zM19,4H20V5H19zM20,4H21V5H20zM21,4H22V5H21zM22,4H23V5H22zM23,4H24V5H23zM27,4H28V5H27zM29,4H30V5H29zM30,4H31V5H30zM32,4H33V5H32zM34,4H35V5H34zM35,4H36V5H35zM36,4H37V5H36zM38,4H39V5H38zM2,5H3V6H2zM4,5H5V6H4zM5,5H6V6H5zM6,5H7V6H6zM8,5H9V6H8zM13,5H14V6H13zM14,5H15V6H14zM15,5H16V6H15zM16,5H17V6H16zM18,5H19V6H18zM19,5H20V6H19zM20,5H21V6H20zM22,5H23V6H22zM23,5H24V6H23zM24,5H25V6H24zM25,5H26V6H25zM27,5H28V6H27zM29,5H30V6H29zM30,5H31V6H30zM32,5H33V6H32zM34,5H35V6H34zM35,5H36V6H35zM36,5H37V6H36zM38,5H39V6H38zM2,6H3V7H2zM4,6H5V7H4zM5,6H6V7H5zM6,6H7V7H6zM8,6H9V7H8zM13,6H14V7H13zM14,6H15V7H14zM15,6H16V7H15zM17,6H18V7H17zM20,6H21V7H20zM24,6H25V7H24zM27,6H28V7H27zM28,6H29V7H28zM30,6H31V7H30zM32,6H33V7H32zM34,6H35V7H34zM35,6H36V7H35zM36,6H37V7H36zM38,6H39V7H38zM2,7H3V8H2zM8,7H9V8H8zM10,7H11V8H10zM12,7H13V8H12zM14,7H15V8H14zM17,7H18V8H17zM19,7H20V8H19zM20,7H21V8H20zM22,7H23V8H22zM23,7H24V8H23zM24,7H25V8H24zM27,7H28V8H27zM28,7H29V8H28zM32,7H33V8H32zM38,7H39V8H38zM2,8H3V9H2zM3,8H4V9H3zM4,8H5V9H4zM5,8H6V9H5zM6,8H7V9H6zM7,8H8V9H7zM8,8H9V9H8zM10,8H11V9H10zM12,8H13V9H12zM14,8H15V9H14zM16,8H17V9H16zM18,8H19V9H18zM20,8H21V9H20zM22,8H23V9H22zM24,8H25V9H24zM26,8H27V9H26zM28,8H29V9H28zM30,8H31V9H30zM32,8H33V9H32zM33,8H34V9H33zM34,8H35V9H34zM35,8H36V9H35zM36,8H37V9H36zM37,8H38V9H37zM38,8H39V9H38zM13,9H14V10H13zM15,9H16V10H15zM16,9H17V10H16zM19,9H20V10H19zM21,9H22V10H21zM24,9H25V10H24zM25,9H26V10H25zM26,9H27V10H26zM29,9H30V10H29zM2,10H3V11H2zM4,10H5V11H4zM8,10H9V11H8zM9,10H10V11H9zM11,10H12V11H11zM14,10H15V11H14zM16,10H17V11H16zM17,10H18V11H17zM19,10H20V11H19zM21,10H22V11H21zM22,10H23V11H22zM23,10H24V11H23zM24,10H25V11H24zM26,10H27V11H26zM29,10H30V11H29zM30,10H31V11H30zM33,10H34V11H33zM36,10H37V11H36zM38,10H39V11H38zM3,11H4V12H3zM4,11H5V12H4zM5,11H6V12H5zM7,11H8V12H7zM9,11H10V12H9zM12,11H13V12H12zM14,11H15V12H14zM15,11H16V12H15zM16,11H17V12H16zM19,11H20V12H19zM22,11H23V12H22zM23,11H24V12H23zM25,11H26V12H25zM26,11H27V12H26zM27,11H28V12H27zM29,11H30V12H29zM30,11H31V12H30zM32,11H33V12H32zM33,11H34V12H33zM37,11H38V12H37zM38,11H39V12H38zM2,12H3V13H2zM4,12H5V13H4zM5,12H6V13H5zM6,12H7V13H6zM8,12H9V13H8zM9,12H10V13H9zM11,12H12V13H11zM12,12H13V13H12zM13,12H14V13H13zM15,12H16V13H15zM16,12H17V13H16zM17,12H18V13H17zM19,12H20V13H19zM20,12H21V13H20zM22,12H23V13H22zM25,12H26V13H25zM29,12H30V13H29zM30,12H31V13H30zM32,12H33V13H32zM34,12H35V13H34zM38,12H39V13H38zM4,13H5V14H4zM5,13H6V14H5zM6,13H7V14H6zM7,13H8V14H7zM9,13H10V14H9zM10,13H11V14H10zM11,13H12V14H11zM14,13H15V14H14zM16,13H17V14H16zM20,13H21V14H20zM21,13H22V14H21zM22,13H23V14H22zM24,13H25V14H24zM29,13H30V14H29zM30,13H31V14H30zM31,13H32V14H31zM33,13H34V14H33zM35,13H36V14H35zM4,14H5V15H4zM8,14H9V15H8zM9,14H10V15H9zM11,14H12V15H11zM12,14H13V15H12zM14,14H15V15H14zM15,14H16V15H15zM17,14H18V15H17zM18,14H19V15H18zM24,14H25V15H24zM26,14H27V15H26zM32,14H33V15H32zM33,14H34V15H33zM35,14H36V15H35zM38,14H39V15H38zM2,15H3V16H2zM6,15H7V16H6zM7,15H8V16H7zM10,15H11V16H10zM13,15H14V16H13zM14,15H15V16H14zM17,15H18V16H17zM20,15H21V16H20zM21,15H22V16H21zM22,15H23V16H22zM23,15H24V16H23zM25,15H26V16H25zM29,15H30V16H29zM31,15H32V16H31zM32,15H33V16H32zM33,15H34V16H33zM35,15H36V16H35zM38,15H39V16H38zM2,16H3V17H2zM4,16H5V17H4zM5,16H6V17H5zM7,16H8V17H7zM8,16H9V17H8zM10,16H11V17H10zM12,16H13V17H12zM14,16H15V17H14zM17,16H18V17H17zM18,16H19V17H18zM19,16H20V17H19zM20,16H21V17H20zM21,16H22V17H21zM22,16H23V17H22zM25,16H26V17H25zM26,16H27V17H26zM27,16H28V17H27zM29,16H30V17H29zM35,16H36V17H35zM36,16H37V17H36zM38,16H39V17H38zM6,17H7V18H6zM10,17H11V18H10zM13,17H14V18H13zM15,17H16V18H15zM17,17H18V18H17zM18,17H19V18H18zM20,17H21V18H20zM21,17H22V18H21zM22,17H23V18H22zM23,17H24V18H23zM25,17H26V18H25zM28,17H29V18H28zM29,17H30V18H29zM32,17H33V18H32zM33,17H34V18H33zM34,17H35V18H34zM35,17H36V18H35zM37,17H38V18H37zM38,17H39V18H38zM2,18H3V19H2zM3,18H4V19H3zM5,18H6V19H5zM7,18H8V19H7zM8,18H9V19H8zM9,18H10V19H9zM11,18H12V19H11zM14,18H15V19H14zM16,18H17V19H16zM18,18H19V19H18zM19,18H20V19H19zM20,18H21V19H20zM23,18H24V19H23zM25,18H26V19H25zM26,18H27V19H26zM30,18H31V19H30zM31,18H32V19H31zM32,18H33V19H32zM33,18H34V19H33zM37,18H38V19H37zM38,18H39V19H38zM4,19H5V20H4zM5,19H6V20H5zM6,19H7V20H6zM7,19H8V20H7zM9,19H10V20H9zM11,19H12V20H11zM13,19H14V20H13zM14,19H15V20H14zM15,19H16V20H15zM16,19H17V20H16zM18,19H19V20H18zM20,19H21V20H20zM23,19H24V20H23zM25,19H26V20H25zM26,19H27V20H26zM29,19H30V20H29zM30,19H31V20H30zM32,19H33V20H32zM33,19H34V20H33zM35,19H36V20H35zM36,19H37V20H36zM37,19H38V20H37zM38,19H39V20H38zM2,20H3V21H2zM4,20H5V21H4zM8,20H9V21H8zM9,20H10V21H9zM10,20H11V21H10zM14,20H15V21H14zM15,20H16V21H15zM16,20H17V21H16zM18,20H19V21H18zM19,20H20V21H19zM21,20H22V21H21zM25,20H26V21H25zM26,20H27V21H26zM29,20H30V21H29zM31,20H32V21H31zM32,20H33V21H32zM34,20H35V21H34zM38,20H39V21H38zM2,21H3V22H2zM5,21H6V22H5zM7,21H8V22H7zM9,21H10V22H9zM15,21H16V22H15zM16,21H17V22H16zM17,21H18V22H17zM18,21H19V22H18zM24,21H25V22H24zM26,21H27V22H26zM28,21H29V22H28zM30,21H31V22H30zM32,21H33V22H32zM33,21H34V22H33zM34,21H35V22H34zM35,21H36V22H35zM3,22H4V23H3zM5,22H6V23H5zM6,22H7V23H6zM8,22H9V23H8zM11,22H12V23H11zM12,22H13V23H12zM14,22H15V23H14zM16,22H17V23H16zM18,22H19V23H18zM21,22H22V23H21zM22,22H23V23H22zM23,22H24V23H23zM25,22H26V23H25zM26,22H27V23H26zM30,22H31V23H30zM32,22H33V23H32zM33,22H34V23H33zM35,22H36V23H35zM37,22H38V23H37zM3,23H4V24H3zM5,23H6V24H5zM7,23H8V24H7zM11,23H12V24H11zM16,23H17V24H16zM17,23H18V24H17zM18,23H19V24H18zM19,23H20V24H19zM20,23H21V24H20zM21,23H22V24H21zM22,23H23V24H22zM25,23H26V24H25zM26,23H27V24H26zM27,23H28V24H27zM29,23H30V24H29zM30,23H31V24H30zM32,23H33V24H32zM37,23H38V24H37zM38,23H39V24H38zM2,24H3V25H2zM3,24H4V25H3zM5,24H6V25H5zM7,24H8V25H7zM8,24H9V25H8zM9,24H10V25H9zM10,24H11V25H10zM15,24H16V25H15zM17,24H18V25H17zM21,24H22V25H21zM23,24H24V25H23zM24,24H25V25H24zM25,24H26V25H25zM27,24H28V25H27zM29,24H30V25H29zM35,24H36V25H35zM36,24H37V25H36zM38,24H39V25H38zM2,25H3V26H2zM3,25H4V26H3zM5,25H6V26H5zM11,25H12V26H11zM12,25H13V26H12zM15,25H16V26H15zM16,25H17V26H16zM17,25H18V26H17zM18,25H19V26H18zM19,25H20V26H19zM24,25H25V26H24zM26,25H27V26H26zM29,25H30V26H29zM31,25H32V26H31zM33,25H34V26H33zM34,25H35V26H34zM35,25H36V26H35zM37,25H38V26H37zM2,26H3V27H2zM5,26H6V27H5zM6,26H7V27H6zM7,26H8V27H7zM8,26H9V27H8zM10,26H11V27H10zM11,26H12V27H11zM12,26H13V27H12zM14,26H15V27H14zM16,26H17V27H16zM19,26H20V27H19zM22,26H23V27H22zM23,26H24V27H23zM24,26H25V27H24zM25,26H26V27H25zM26,26H27V27H26zM28,26H29V27H28zM29,26H30V27H29zM30,26H31V27H30zM32,26H33V27H32zM33,26H34V27H33zM38,26H39V27H38zM4,27H5V28H4zM5,27H6V28H5zM6,27H7V28H6zM9,27H10V28H9zM12,27H13V28H12zM13,27H14V28H13zM14,27H15V28H14zM22,27H23V28H22zM23,27H24V28H23zM24,27H25V28H24zM25,27H26V28H25zM26,27H27V28H26zM27,27H28V28H27zM29,27H30V28H29zM32,27H33V28H32zM35,27H36V28H35zM36,27H37V28H36zM38,27H39V28H38zM2,28H3V29H2zM3,28H4V29H3zM4,28H5V29H4zM6,28H7V29H6zM7,28H8V29H7zM8,28H9V29H8zM9,28H10V29H9zM14,28H15V29H14zM15,28H16V29H15zM17,28H18V29H17zM19,28H20V29H19zM22,28H23V29H22zM23,28H24V29H23zM25,28H26V29H25zM27,28H28V29H27zM28,28H29V29H28zM29,28H30V29H29zM30,28H31V29H30zM31,28H32V29H31zM33,28H34V29H33zM35,28H36V29H35zM36,28H37V29H36zM38,28H39V29H38zM16,29H17V30H16zM20,29H21V30H20zM21,29H22V30H21zM22,29H23V30H22zM26,29H27V30H26zM28,29H29V30H28zM30,29H31V30H30zM31,29H32V30H31zM35,29H36V30H35zM2,30H3V31H2zM3,30H4V31H3zM5,30H6V31H5zM6,30H7V31H6zM7,30H8V31H7zM8,30H9V31H8zM9,30H10V31H9zM10,30H11V31H10zM12,30H13V31H12zM13,30H14V31H13zM14,30H15V31H14zM15,30H16V31H15zM17,30H18V31H17zM18,30H19V31H18zM22,30H23V31H22zM25,30H26V31H25zM30,30H31V31H30zM31,30H32V31H31zM32,30H33V31H32zM33,30H34V31H33zM34,30H35V31H34zM35,30H36V31H35zM38,30H39V31H38zM10,31H11V32H10zM15,31H16V32H15zM17,31H18V32H17zM18,31H19V32H18zM21,31H22V32H21zM22,31H23V32H22zM23,31H24V32H23zM25,31H26V32H25zM26,31H27V32H26zM27,31H28V32H27zM28,31H29V32H28zM30,31H31V32H30zM34,31H35V32H34zM38,31H39V32H38zM2,32H3V33H2zM3,32H4V33H3zM4,32H5V33H4zM5,32H6V33H5zM6,32H7V33H6zM7,32H8V33H7zM8,32H9V33H8zM10,32H11V33H10zM11,32H12V33H11zM12,32H13V33H12zM16,32H17V33H16zM17,32H18V33H17zM19,32H20V33H19zM20,32H21V33H20zM21,32H22V33H21zM25,32H26V33H25zM26,32H27V33H26zM27,32H28V33H27zM30,32H31V33H30zM32,32H33V33H32zM34,32H35V33H34zM38,32H39V33H38zM2,33H3V34H2zM8,33H9V34H8zM11,33H12V34H11zM14,33H15V34H14zM15,33H16V34H15zM16,33H17V34H16zM20,33H21V34H20zM22,33H23V34H22zM23,33H24V34H23zM28,33H29V34H28zM29,33H30V34H29zM30,33H31V34H30zM34,33H35V34H34zM37,33H38V34H37zM2,34H3V35H2zM4,34H5V35H4zM5,34H6V35H5zM6,34H7V35H6zM8,34H9V35H8zM11,34H12V35H11zM14,34H15V35H14zM18,34H19V35H18zM19,34H20V35H19zM20,34H21V35H20zM23,34H24V35H23zM26,34H27V35H26zM29,34H30V35H29zM30,34H31V35H30zM31,34H32V35H31zM32,34H33V35H32zM33,34H34V35H33zM34,34H35V35H34zM2,35H3V36H2zM4,35H5V36H4zM5,35H6V36H5zM6,35H7V36H6zM8,35H9V36H8zM11,35H12V36H11zM12,35H13V36H12zM15,35H16V36H15zM18,35H19V36H18zM20,35H21V36H20zM25,35H26V36H25zM26,35H27V36H26zM29,35H30V36H29zM31,35H32V36H31zM34,35H35V36H34zM2,36H3V37H2zM4,36H5V37H4zM5,36H6V37H5zM6,36H7V37H6zM8,36H9V37H8zM10,36H11V37H10zM11,36H12V37H11zM12,36H13V37H12zM18,36H19V37H18zM20,36H21V37H20zM21,36H22V37H21zM23,36H24V37H23zM24,36H25V37H24zM25,36H26V37H25zM27,36H28V37H27zM29,36H30V37H29zM31,36H32V37H31zM33,36H34V37H33zM34,36H35V37H34zM36,36H37V37H36zM38,36H39V37H38zM2,37H3V38H2zM8,37H9V38H8zM11,37H12V38H11zM12,37H13V38H12zM16,37H17V38H16zM17,37H18V38H17zM18,37H19V38H18zM20,37H21V38H20zM24,37H25V38H24zM26,37H27V38H26zM30,37H31V38H30zM31,37H32V38H31zM34,37H35V38H34zM35,37H36V38H35zM2,38H3V39H2zM3,38H4V39H3zM4,38H5V39H4zM5,38H6V39H5zM6,38H7V39H6zM7,38H8V39H7zM8,38H9V39H8zM10,38H11V39H10zM12,38H13V39H12zM18,38H19V39H18zM21,38H22V39H21zM22,38H23V39H22zM24,38H25V39H24zM26,38H27V39H26zM30,38H31V39H30zM32,38H33V39H32zM33,38H34V39H33zM38,38H39V39H38z" id="qr-path" fill="#000000" fill-opacity="1" fill-rule="nonzero" stroke="none"/></svg></div><div><small>Ver la presentación interactiva</small><a href="https://eriick29.github.io/La-institucion-escolar-en-el-nivel-medio/">https://eriick29.github.io/La-institucion-escolar-en-el-nivel-medio/</a></div></div>
   </div>
+<div class="pagina">10</div>
 </section>
+
 
 </div></main>
 
@@ -956,23 +958,23 @@ document.getElementById('btnPdfOk').onclick=e=>{e.stopPropagation();document.get
 
 // ===== mini menú =====
 const TITULOS=[
- ['Inicio','Portada'],['Inicio','Tres miradas a la Media'],['Inicio','¿Qué dice la Ley Orgánica?'],
- ['I. Nivel personal','El respeto'],['I. Nivel personal','La responsabilidad'],['I. Nivel personal','Valoración y propuesta'],
- ['II. Proyección pedagógica','El nuevo rol del docente'],['II. Proyección pedagógica','Mediador por competencias'],['II. Proyección pedagógica','Orientador y formador integral'],
- ['III. Nivel institucional','Desafío 1: conectada con el trabajo'],['III. Nivel institucional','Desafío 2: escuela inclusiva'],['III. Nivel institucional','Desafío 3: escuela de calidad'],['III. Nivel institucional','Panamá en cifras'],
- ['Cierre','Conclusión'],['Cierre','¡Gracias!']];
+ ['Inicio','Portada'],['Inicio','Las tres preguntas'],
+ ['I. Nivel personal','El respeto'],['I. Nivel personal','La responsabilidad'],
+ ['II. Proyección pedagógica','Mediador por competencias'],['II. Proyección pedagógica','Orientador y formador integral'],
+ ['III. Nivel institucional','Desafío 1: conectada con el trabajo'],['III. Nivel institucional','Desafío 2: escuela inclusiva'],['III. Nivel institucional','Desafío 3: escuela de calidad'],
+ ['Cierre','Conclusión y gracias']];
 const mm=document.getElementById('minimenu'),mmPanel=document.getElementById('mmPanel');
 const vistos=new Set();
 function pintarMenu(n){
   vistos.add(n);
   const tot=slides.length,falt=tot-1-n;
-  document.getElementById('mmPos').textContent=(n+1)+' / '+tot;
+  const PREG={2:'I',4:'II',6:'III'};document.getElementById('mmPos').innerHTML=(n+1)+' / '+tot+(PREG[n]?' <span class="mm-star">★</span>':'');
   document.getElementById('mmSec').textContent=(TITULOS[n]||['',''])[0];
     let html='<div class="mm-barra"><i style="width:'+((n+1)/tot*100)+'%"></i></div>',grupo='';
   slides.forEach((_,i)=>{const t=TITULOS[i]||['','Diapositiva '+(i+1)];
     if(t[0]!==grupo){grupo=t[0];html+='<div class="mm-grupo">'+grupo+'</div>'}
     const cl=i===n?'actual':(vistos.has(i)?'visto':'');
-    html+='<button class="mm-item '+cl+'" data-i="'+i+'"><span class="n">'+(cl==='visto'?'✓':i+1)+'</span>'+t[1]+'</button>'});
+    html+='<button class="mm-item '+cl+'" data-i="'+i+'"><span class="n'+(PREG[i]?' q':'')+'">'+(PREG[i]?'★':(cl==='visto'?'✓':i+1))+'</span>'+(PREG[i]?'Pregunta '+PREG[i]+': ':'')+t[1]+'</button>'});
   mmPanel.innerHTML=html;
   mmPanel.querySelectorAll('.mm-item').forEach(b=>b.onclick=e=>{e.stopPropagation();mm.classList.remove('abierto');ir(+b.dataset.i)});
   document.body.classList.toggle('en-final',n===tot-1);
@@ -985,8 +987,8 @@ document.addEventListener('keydown',e=>{if(e.key==='m'||e.key==='M')mm.classList
 // ===== mundo + cámara; fondo, hilo y viajero dibujados en canvas (fluido) =====
 const mundo=document.getElementById('mundo'),geo=document.getElementById('geo'),lz=document.getElementById('lienzo'),ctx=lz.getContext('2d');
 document.body.appendChild(document.getElementById('tip'));
-const ROT=[0,-4,3,-2,4,-3,2,-5,3,-2,4,-3,2,-4,0];
-const AMB=[[285,320],[300,260],[265,200],[340,20],[350,30],[330,10],[200,170],[210,180],[190,160],[165,230],[175,250],[155,215],[220,280],[270,320],[280,330]];
+const ROT=[0,-4,3,-2,4,-3,2,-5,3,0];
+const AMB=[[285,320],[300,260],[340,20],[350,30],[200,170],[190,160],[165,230],[175,250],[155,215],[280,330]];
 slides.forEach((s,i)=>{const [h1,h2]=AMB[i]||[280,320];
   s.style.setProperty('--fondo',`radial-gradient(circle at 12% 18%,hsla(${h1},95%,58%,.34),transparent 42%),radial-gradient(circle at 88% 85%,hsla(${h2},95%,55%,.28),transparent 45%),linear-gradient(135deg,hsl(${h1},65%,8%),hsl(${h2},60%,13%))`)});
 let POS=[],W=0,H=0,DPR=1,segEls=[],ACUM=[0],TOTAL=0,rafV=null,vueloTok=0,CAM={x:0,y:0,r:0,s:1},VIA=null;
